@@ -12,7 +12,7 @@
             <input type="text" v-model="code" placeholder="Par exemple: 4562" class="input"/>
           </div>
         </div>
-        <button class="button is-primary">Rejoindre</button>
+        <button class="button is-primary" v-on:click="join">Rejoindre</button>
       </div>
 
       <hr/>
@@ -35,6 +35,11 @@ export default {
   name: 'HomeView',
   components: {
     //HelloWorld
+  },
+  methods: {
+    join : function () {
+      this.$router.push(`/game/${this.code}`)
+    }
   },
   data: function () {
     return {

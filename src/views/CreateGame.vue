@@ -93,7 +93,7 @@ export default {
         });
     },
     join : function () {
-      this.$router.push(`/game/${this.game.code}`)
+      this.$router.push(`/game/${this.game.code}?admin=1`)
     }
   }
 }
