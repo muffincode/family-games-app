@@ -1,10 +1,18 @@
 <template>
-  <div class="mimes">
+  <div class="container mimes">
     <h1 class="title">Tour de {{currentPlayer.name}}</h1>
+
+    <!--
+    <div class="notification is-primary">
+      <p><b>Manche terminée!</b><br/>L'équipe bleue gagne 🥳</p><br/>
+      <button class="button is-primary is-light is-small">Manche suivante</button>
+    </div>
+  -->
 
     <div class="list">
       <ul>
-        <li class="box" v-for="w in currentWordsList" :key="w.content">
+        <li class="box" v-for="w in currentWordsList" :key="w.content"
+        :class="{ 'found': w.guessedByLeft && w.guessedByRight }">
           <p
             class="word title"
             :class="{ blurred: w.blurred}"
@@ -42,8 +50,9 @@
 <script>
 import axios from "axios";
 
-function randomIntFromInterval(min, max) { // min and max included
-  return Math.floor(Math.random() * (max - min + 1) + min)
+function randomInt(seed,max) { // min and max included
+  return parseInt(seed%max)
+  //return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
 export default {
@@ -60,15 +69,16 @@ export default {
     gameCode: null
   },
   beforeCreate: function () {
-    axios.get('http://localhost:3000' + '/players?gameCode=' + this.gameCode)
-      .then(res => {
-        this.players = res.data.filter(p => p.gameCode)
-        this.decideNewPlayer()
-      })
-      .catch(err => console.log(err))
-    axios.get('http://localhost:3000' + '/games?code=' + this.gameCode)
-      .then(res => this.game = res.data)
-      .catch(err => console.log(err))
+    Promise.all([
+      axios.get('http://localhost:3000' + '/players?gameCode=' + this.gameCode),
+      axios.get('http://localhost:3000' + '/games?code=' + this.gameCode)
+    ]).then(async([players, games]) => {
+      this.players = players.data.filter(p => p.gameCode)
+      this.game = games.data[0]
+      this.decideNewPlayer()
+    }).catch(error => {
+      console.log(error);
+    });
   },
   methods: {
     wordFoundBy: function(word, leftOrRight){
@@ -79,7 +89,7 @@ export default {
     },
     decideNewPlayer: function () {
       const haveNotPlayed = this.players.filter(p => !p.hasPlayed)
-      this.currentPlayer = haveNotPlayed[randomIntFromInterval(0,haveNotPlayed.length-1)]
+      this.currentPlayer = haveNotPlayed[randomInt(this.game.dateCreated/haveNotPlayed.length, haveNotPlayed.length)]
       this.currentWordsList = this.currentPlayer.wordsList.map(w => {
         return {
           content: w,
@@ -97,6 +107,11 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .list {
+  .box.found{ /* to do : reduced (when found, auto reduce)*/
+    font-size: 10px;
+    .buttons { display: none; }
+    p { margin: 0;}
+  }
   .word {
     font-size: 300%;
     text-align: left;

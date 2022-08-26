@@ -171,7 +171,7 @@ export default {
       .then(response => {
         this.game = response.data[0]
         this.game.nbWords = parseInt(response.data[0].nbWords)
-        this.playerReady = (this.words.length == this.game.nbWords)
+
         if (this.game.status != "running" && between(this.game.dateCreated, this.game.validUntil)) {
           this.game.status = "open"
 
@@ -198,7 +198,13 @@ export default {
       .then(res => {
         this.otherPlayers = res.data.filter(p => p.gameCode)
         let yourWords = this.otherPlayers.find(p => p.name == this.name)
-        this.words = yourWords ? yourWords.wordsList : []
+        if (yourWords) {
+          this.words = yourWords.wordsList
+          this.playerReady = true
+        } else {
+          this.words = []
+          this.playerReady = false
+        }
       })
       .catch(err => console.log(err))
     this.updateGameInfo();
