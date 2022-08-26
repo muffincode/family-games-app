@@ -1,7 +1,6 @@
 <template>
-  <div class="game container">
-
-    <div class="section" v-if="game.status == 'invalid'">
+  <div class="section game">
+    <div class="container" v-if="game.status == 'invalid'">
       <div class="notification is-danger">
         <p>La partie n'existe pas (ou plus) !</p>
         <p><a href="/">Retour</a></p>
@@ -9,7 +8,7 @@
     </div>
 
     <!-- Game is ok to be joined -->
-    <div class="section" v-if="game.status == 'open'">
+    <div class="container" v-if="game.status == 'open'">
       <h2 class="title is-2">{{ game.name }} <span class="tag is-info is-light">{{ game.code }}</span></h2>
 
       <!-- Welcome message -->
@@ -66,12 +65,8 @@
     </div>
 
     <!-- Game is currently running -->
-    <div class="section" v-if="game.status == 'running'">
-      <Mimes :gameCode="this.game.code"/>
-    </div>
-
+    <Mimes :gameCode="this.game.code" v-if="game.status == 'running'"/>
   </div>
-
 </template>
 
 <script>
@@ -129,6 +124,7 @@ export default {
       // Send or update players info
       const playerId = localStorage.getItem('playerId')
 
+      // TODO fix player joining 2 games at once
       axios({
         method: playerId ? 'put' : 'post', //if playerId exists, update, else post
         url: 'http://localhost:3000' + '/players/' + (playerId ? playerId : ''),
@@ -156,21 +152,18 @@ export default {
     updateGameInfo: function () {
       if (this.game.status == "running") return;
 
-      // TODO wrap with Promise.all() ?
-      // Update player list
-      axios.get('http://localhost:3000' + '/players?gameCode=' + this.game.code)
-        .then(res => this.otherPlayers = res.data.filter(p => p.gameCode))
-        .catch(err => console.log(err))
+      Promise.all([
+        axios.get('http://localhost:3000' + '/players?gameCode=' + this.game.code),
+        axios.get('http://localhost:3000' + '/games', {
+          params: {
+            code: this.game.code
+          }
+        })
+      ]).then(async([players, games]) => {
+        this.otherPlayers = players.data.filter(p => p.gameCode)
 
-      // Update games info
-      axios.get('http://localhost:3000' + '/games', {
-        params: {
-          code: this.game.code
-        }
-      })
-      .then(response => {
-        this.game = response.data[0]
-        this.game.nbWords = parseInt(response.data[0].nbWords)
+        this.game = games.data[0]
+        this.game.nbWords = parseInt(this.game.nbWords)
 
         if (this.game.status != "running" && between(this.game.dateCreated, this.game.validUntil)) {
           this.game.status = "open"

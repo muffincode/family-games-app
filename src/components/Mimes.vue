@@ -9,6 +9,30 @@
     </div>
   -->
 
+  <!--
+  <div class="content">
+    <div class="notification is-info">
+      <p><b>L'équipe bleue</b> est composée<br/>des personnes suivantes:</p>
+      <div class="tags">
+        <span class="tag is-info is-light is-small">Camille</span>
+        <span class="tag is-info is-light is-small">Constan</span>
+        <span class="tag is-info is-light is-small">Léo</span>
+      </div>
+    </div>
+
+    <div class="notification is-danger">
+      <p><b>L'équipe rouge</b> est composée<br/>des personnes suivantes:</p>
+      <div class="tags">
+        <span class="tag is-danger is-light is-small">Annick</span>
+        <span class="tag is-danger is-light is-small">Mary</span>
+      </div>
+    </div>
+
+    <button class="button is-primary">Tout le monde est en place !</button>
+
+  </div>
+  -->
+
     <div class="list">
       <ul>
         <li class="box" v-for="w in currentWordsList" :key="w.content"
