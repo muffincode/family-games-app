@@ -156,16 +156,10 @@ export default {
     updateGameInfo: function () {
       if (this.game.status == "running") return;
 
-      this.game.code = this.$route.params.code
-
       // TODO wrap with Promise.all() ?
       // Update player list
       axios.get('http://localhost:3000' + '/players?gameCode=' + this.game.code)
-        .then(res => {
-          this.otherPlayers = res.data.filter(p => p.gameCode)
-          let yourWords = this.otherPlayers.find(p => p.name == this.name)
-          this.words = yourWords ? yourWords.wordsList : []
-        })
+        .then(res => this.otherPlayers = res.data.filter(p => p.gameCode))
         .catch(err => console.log(err))
 
       // Update games info
@@ -195,10 +189,18 @@ export default {
   },
   mounted: function () {
     this.admin = this.$route.query.admin
+    this.game.code = this.$route.params.code
 
     this.name = localStorage.getItem('playerName')
     this.id = localStorage.getItem('playerId')
 
+    axios.get('http://localhost:3000' + '/players?gameCode=' + this.game.code)
+      .then(res => {
+        this.otherPlayers = res.data.filter(p => p.gameCode)
+        let yourWords = this.otherPlayers.find(p => p.name == this.name)
+        this.words = yourWords ? yourWords.wordsList : []
+      })
+      .catch(err => console.log(err))
     this.updateGameInfo();
     setInterval(this.updateGameInfo, 5000);
   }
