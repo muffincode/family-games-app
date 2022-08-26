@@ -2,6 +2,7 @@
   <div class="container mimes">
     <h1 class="title">Tour de {{currentPlayer.name}}</h1>
 
+    <!-- Before the game -->
     <div class="content" v-if="!playing">
       <div class="notification is-info">
         <p><b>L'équipe bleue</b> est composée<br/>des personnes suivantes:</p>
@@ -24,40 +25,16 @@
 
     </div>
 
-    <div class="block list" v-if="playing">
-      <ul>
-        <li class="box" v-for="w in currentWordsList" :key="w.id"
-        :class="{ 'small': (w.guessedByLeft && w.guessedByRight) || w.blurred }">
-          <p
-            class="word title"
-            :class="{ blurred: w.blurred || !admin}"
-            @click="w.blurred = !w.blurred">{{ w.content }}
-          </p>
-          <div class="buttons">
-            <button
-              class="button is-info"
-              :class="{ 'is-light' : !w.guessedByLeft, 'is-small' : w.guessedByLeft && w.guessedByRight }"
-              @click="wordFoundBy(w, 0)"
-              :disabled="w.disabled || !admin"
-              >
-              {{ w.guessedByLeft ? 'Trouvé !' : 'Valider' }}
-            </button>
-            <button
-              class="button is-danger"
-              :class="{ 'is-light' : !w.guessedByRight, 'is-small' : w.guessedByLeft && w.guessedByRight }"
-              @click="wordFoundBy(w, 1)"
-              :disabled="w.disabled || !admin"
-              >
-              {{ w.guessedByRight ? 'Trouvé !' : 'Valider' }}
-            </button>
-          </div>
-        </li>
-      </ul>
-    </div>
-
+    <!-- Done ! -->
     <div class="notification is-primary" v-if="roundDone">
       <p><b>Manche terminée!</b><br/>L'équipe {{ winner }} gagne 🥳</p><br/>
       <button class="button is-primary is-light is-small">Manche suivante</button>
+    </div>
+
+    <!-- Currently playing -->
+    <div class="block list" v-if="playing">
+      <CardItem colour="blue" :words="currentWordsList" :index="status.left" @next="status.left++"/>
+      <CardItem colour="red" :words="currentWordsList" :index="status.right" @next="status.right++"/>
     </div>
 
   </div>
@@ -65,6 +42,7 @@
 
 <script>
 import axios from "axios";
+import CardItem from '@/components/CardItem.vue'
 
 function randomInt(seed,max) { // min and max included
   return parseInt(seed%max)
@@ -80,15 +58,19 @@ export default {
       game: null,
       currentPlayer: {name: "?"},
       currentWordsList: [],
+      status: { left: 0, right: 0 },
       admin: this.$route.query.admin
     }
   },
+  components: {
+    CardItem
+  },
   computed: {
     roundDone: function () {
-      return this.currentWordsList.at(-1).guessedByLeft || this.currentWordsList.at(-1).guessedByRight
+      return this.status.left == this.currentWordsList.length || this.status.right == this.currentWordsList.length
     },
     winner: function () {
-      return this.currentWordsList.at(-1).guessedByLeft ? 'bleue' : 'rouge'
+      return this.status.left == this.currentWordsList.length ? 'bleue' : 'rouge'
     }
   },
   props: {
@@ -107,29 +89,18 @@ export default {
     });
   },
   methods: {
-    wordFoundBy: function(word, leftOrRight){
-      console.log(word, leftOrRight)
-      if (!leftOrRight)
-        word.guessedByLeft = true
-      else word.guessedByRight = true
-
-      this.currentWordsList[word.id + 1].disabled = false;
-      this.currentWordsList[word.id + 1].blurred = false;
-    },
     decideNewPlayer: function () {
+      /* delete this vvv */
       const haveNotPlayed = this.players.filter(p => !p.hasPlayed)
       this.currentPlayer = haveNotPlayed[randomInt(this.game.dateCreated/haveNotPlayed.length, haveNotPlayed.length)]
-      this.currentWordsList = this.currentPlayer.wordsList.map((w, i) => {
+      /* delete this ^^^ */
+      this.currentWordsList = this.currentPlayer.wordsList
+      /*this.currentWordsList = this.currentPlayer.wordsList.map((w, i) => {
         return {
           content: w,
           id: i,
-          blurred: true,
-          guessedByLeft: false,
-          guessedByRight: false,
-          disabled: true
         }
-      })
-      this.currentWordsList[0].disabled = false;
+      })*/
     }
   }
 }
