@@ -122,7 +122,7 @@ export default {
 
 
       // Send or update players info
-      const playerId = localStorage.getItem('playerId')
+      const playerId = localStorage.getItem('playerId') ? localStorage.getItem('playerId').split('/')[0] : null
 
       // TODO fix player joining 2 games at once
       axios({
@@ -137,7 +137,7 @@ export default {
         }
       }).then(response => {
         console.log(response);
-        localStorage.setItem('playerId', response.data.id);
+        localStorage.setItem('playerId', response.data.id + "/" + this.game.code);
         localStorage.setItem('playerName', this.name);
         this.playerReady = true
         window.scrollTo(0, 0);
@@ -186,6 +186,11 @@ export default {
 
     this.name = localStorage.getItem('playerName')
     this.id = localStorage.getItem('playerId')
+
+    if(this.id && this.id.split('/')[1] != this.game.code) {
+      console.log("joining new game!")
+      localStorage.removeItem('playerId')
+    }
 
     axios.get('http://localhost:3000' + '/players?gameCode=' + this.game.code)
       .then(res => {

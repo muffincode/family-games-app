@@ -2,58 +2,51 @@
   <div class="container mimes">
     <h1 class="title">Tour de {{currentPlayer.name}}</h1>
 
-    <!--
-    <div class="notification is-primary">
-      <p><b>Manche terminée!</b><br/>L'équipe bleue gagne 🥳</p><br/>
-      <button class="button is-primary is-light is-small">Manche suivante</button>
-    </div>
-  -->
-
-  <!--
-  <div class="content">
-    <div class="notification is-info">
-      <p><b>L'équipe bleue</b> est composée<br/>des personnes suivantes:</p>
-      <div class="tags">
-        <span class="tag is-info is-light is-small">Camille</span>
-        <span class="tag is-info is-light is-small">Constan</span>
-        <span class="tag is-info is-light is-small">Léo</span>
+    <div class="content" v-if="!playing">
+      <div class="notification is-info">
+        <p><b>L'équipe bleue</b> est composée<br/>des personnes suivantes:</p>
+        <div class="tags">
+          <span class="tag is-info is-light is-small">Camille</span>
+          <span class="tag is-info is-light is-small">Constan</span>
+          <span class="tag is-info is-light is-small">Léo</span>
+        </div>
       </div>
-    </div>
 
-    <div class="notification is-danger">
-      <p><b>L'équipe rouge</b> est composée<br/>des personnes suivantes:</p>
-      <div class="tags">
-        <span class="tag is-danger is-light is-small">Annick</span>
-        <span class="tag is-danger is-light is-small">Mary</span>
+      <div class="notification is-danger">
+        <p><b>L'équipe rouge</b> est composée<br/>des personnes suivantes:</p>
+        <div class="tags">
+          <span class="tag is-danger is-light is-small">Annick</span>
+          <span class="tag is-danger is-light is-small">Mary</span>
+        </div>
       </div>
+
+      <button class="button is-primary" @click="playing = true">Tout le monde est en place !</button>
+
     </div>
 
-    <button class="button is-primary">Tout le monde est en place !</button>
-
-  </div>
-  -->
-
-    <div class="list">
+    <div class="block list" v-if="playing">
       <ul>
-        <li class="box" v-for="w in currentWordsList" :key="w.content"
-        :class="{ 'found': w.guessedByLeft && w.guessedByRight }">
+        <li class="box" v-for="w in currentWordsList" :key="w.id"
+        :class="{ 'small': (w.guessedByLeft && w.guessedByRight) || w.blurred }">
           <p
             class="word title"
-            :class="{ blurred: w.blurred}"
+            :class="{ blurred: w.blurred || !admin}"
             @click="w.blurred = !w.blurred">{{ w.content }}
           </p>
-          <div class="buttons" v-if="!w.bothFound && !w.blurred">
+          <div class="buttons">
             <button
-              class="button"
-              :class="{ 'is-info': !w.guessedByLeft, 'is-light' : w.guessedByLeft }"
+              class="button is-info"
+              :class="{ 'is-light' : !w.guessedByLeft, 'is-small' : w.guessedByLeft && w.guessedByRight }"
               @click="wordFoundBy(w, 0)"
+              :disabled="w.disabled || !admin"
               >
               {{ w.guessedByLeft ? 'Trouvé !' : 'Valider' }}
             </button>
             <button
-              class="button"
-              :class="{ 'is-danger': !w.guessedByRight, 'is-light' : w.guessedByRight }"
+              class="button is-danger"
+              :class="{ 'is-light' : !w.guessedByRight, 'is-small' : w.guessedByLeft && w.guessedByRight }"
               @click="wordFoundBy(w, 1)"
+              :disabled="w.disabled || !admin"
               >
               {{ w.guessedByRight ? 'Trouvé !' : 'Valider' }}
             </button>
@@ -62,11 +55,10 @@
       </ul>
     </div>
 
-<hr/>
-
-    <pre style="text-align: left;">{{ players }}</pre>
-    <hr/>
-    <pre style="text-align: left;">{{ game }}</pre>
+    <div class="notification is-primary" v-if="roundDone">
+      <p><b>Manche terminée!</b><br/>L'équipe {{ winner }} gagne 🥳</p><br/>
+      <button class="button is-primary is-light is-small">Manche suivante</button>
+    </div>
 
   </div>
 </template>
@@ -83,10 +75,20 @@ export default {
   name: 'MimesGame',
   data: function () {
     return {
+      playing: false,
       players: [],
       game: null,
       currentPlayer: {name: "?"},
-      currentWordsList: []
+      currentWordsList: [],
+      admin: this.$route.query.admin
+    }
+  },
+  computed: {
+    roundDone: function () {
+      return this.currentWordsList.at(-1).guessedByLeft || this.currentWordsList.at(-1).guessedByRight
+    },
+    winner: function () {
+      return this.currentWordsList.at(-1).guessedByLeft ? 'bleue' : 'rouge'
     }
   },
   props: {
@@ -110,19 +112,24 @@ export default {
       if (!leftOrRight)
         word.guessedByLeft = true
       else word.guessedByRight = true
+
+      this.currentWordsList[word.id + 1].disabled = false;
+      this.currentWordsList[word.id + 1].blurred = false;
     },
     decideNewPlayer: function () {
       const haveNotPlayed = this.players.filter(p => !p.hasPlayed)
       this.currentPlayer = haveNotPlayed[randomInt(this.game.dateCreated/haveNotPlayed.length, haveNotPlayed.length)]
-      this.currentWordsList = this.currentPlayer.wordsList.map(w => {
+      this.currentWordsList = this.currentPlayer.wordsList.map((w, i) => {
         return {
           content: w,
-          blurred: false,
+          id: i,
+          blurred: true,
           guessedByLeft: false,
           guessedByRight: false,
-          bothFound: false
+          disabled: true
         }
       })
+      this.currentWordsList[0].disabled = false;
     }
   }
 }
@@ -131,9 +138,10 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .list {
-  .box.found{ /* to do : reduced (when found, auto reduce)*/
+  .box.small{ /* to do : reduced (when found, auto reduce)*/
     font-size: 10px;
-    .buttons { display: none; }
+    display: flex;
+    justify-content: space-between;
     p { margin: 0;}
   }
   .word {
@@ -150,7 +158,6 @@ export default {
   .buttons {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 0.5em;
 
     transition: height 0.2s;
     transition-timing-function: ease-out;
