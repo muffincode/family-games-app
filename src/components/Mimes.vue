@@ -95,12 +95,6 @@ export default {
       this.currentPlayer = haveNotPlayed[randomInt(this.game.dateCreated/haveNotPlayed.length, haveNotPlayed.length)]
       /* delete this ^^^ */
       this.currentWordsList = this.currentPlayer.wordsList
-      /*this.currentWordsList = this.currentPlayer.wordsList.map((w, i) => {
-        return {
-          content: w,
-          id: i,
-        }
-      })*/
     }
   }
 }
