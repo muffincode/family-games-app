@@ -119,14 +119,15 @@ export default {
   methods: {
     done: function () {
       this.currentPlayer.hasPlayed = true
+      this.updateScoreboard()
       axios.put('http://localhost:3000' + `/players/${this.currentPlayer.id}`, this.currentPlayer)
-        .then(response => {
-          this.$router.go() // reload page to trigger player update
-          console.log(response);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+      .then(res => {
+        this.$router.go() // reload page to trigger player update
+        console.log(res)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
     },
     decideNewPlayer: function () {
       const haveNotPlayed = this.players.filter(p => !p.hasPlayed)
@@ -163,7 +164,21 @@ export default {
         this.team1.push(players.pop())
       }
       this.team2 = players
+    },
+    updateScoreboard: function() {
+      if (this.status.left == this.currentWordsList.length) {
+        this.team1.forEach(winner => {
+          let w = this.players.find(p => winner.id == p.id)
+          axios.patch('http://localhost:3000' + `/players/${w.id}`, { score: w.score+1 })
+        })
+      } else {
+        this.team2.forEach(winner => {
+          let w = this.players.find(p => winner.id == p.id)
+          axios.patch('http://localhost:3000' + `/players/${w.id}`, { score: w.score+1 })
+        })
+      }
     }
+
   }
 }
 </script>
