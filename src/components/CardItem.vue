@@ -52,8 +52,8 @@ export default {
       default: () => []
     },
     index: {
-      type: String,
-      default: ''
+      type: Number,
+      default: 0
     }
   },
   beforeCreate: function () {

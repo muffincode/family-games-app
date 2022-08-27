@@ -2,22 +2,19 @@
   <div class="container mimes">
     <h1 class="title" v-if="!displayScoreboard">Tour de {{currentPlayer.name}}</h1>
 
-    <!-- Before the game TODO update this -->
+    <!-- Before the game -->
     <div class="content" v-if="!playing && !displayScoreboard">
       <div class="notification is-info">
         <p><b>L'équipe bleue</b> est composée<br/>des personnes suivantes:</p>
         <div class="tags">
-          <span class="tag is-info is-light is-small">Camille</span>
-          <span class="tag is-info is-light is-small">Constan</span>
-          <span class="tag is-info is-light is-small">Léo</span>
+          <span v-for="p in team1" :key="p.id" class="tag is-info is-light is-small">{{p.name}}</span>
         </div>
       </div>
 
       <div class="notification is-danger">
         <p><b>L'équipe rouge</b> est composée<br/>des personnes suivantes:</p>
         <div class="tags">
-          <span class="tag is-danger is-light is-small">Annick</span>
-          <span class="tag is-danger is-light is-small">Mary</span>
+          <span v-for="p in team2" :key="p.id" class="tag is-danger is-light is-small">{{p.name}}</span>
         </div>
       </div>
 
@@ -70,9 +67,9 @@
 import axios from "axios";
 import CardItem from '@/components/CardItem.vue'
 
-function randomInt(seed,max) { // min and max included
+function randomInt(seed,max) {
   return parseInt(seed%max)
-  //return Math.floor(Math.random() * (max - min + 1) + min)
+  //return Math.floor(Math.random() * (max - min + 1) + min) // min and max included
 }
 
 export default {
@@ -86,6 +83,8 @@ export default {
       game: null,
       currentPlayer: {name: "?"},
       currentWordsList: [],
+      team1: [],
+      team2: [],
       status: { left: 0, right: 0 },
       admin: this.$route.query.admin,
     }
@@ -131,7 +130,9 @@ export default {
     },
     decideNewPlayer: function () {
       const haveNotPlayed = this.players.filter(p => !p.hasPlayed)
-      if(haveNotPlayed.length == 1) this.lastRound = true
+      if(haveNotPlayed.length == 1) {
+        this.lastRound = true
+      }
       if(haveNotPlayed.length == 0) {
         this.displayScoreboard = true
         return
@@ -139,6 +140,29 @@ export default {
 
       this.currentPlayer = haveNotPlayed[randomInt(this.game.dateCreated/haveNotPlayed.length, haveNotPlayed.length)]
       this.currentWordsList = this.currentPlayer.wordsList
+
+      this.decideTeams()
+    },
+    decideTeams: function() {
+      this.team1 = []
+      this.team2 = []
+
+      let players = [...this.players]
+      let indexOfCurrentPlayer = this.players.findIndex(p => p.id == this.currentPlayer.id)
+      players.splice(indexOfCurrentPlayer, 1)
+
+      while(players.length > parseInt(this.players.length/2)) {
+        // shuffle array
+        for(let i = players.length - 1; i >= 1; i--) {
+          let j = Math.floor(Math.random() * (i + 1)); // 0 <= j <= i
+          let temp = players[j];
+          players[j] = players[i];
+          players[i] = temp;
+        }
+        // add one to team
+        this.team1.push(players.pop())
+      }
+      this.team2 = players
     }
   }
 }
