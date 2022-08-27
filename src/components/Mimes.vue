@@ -104,8 +104,8 @@ export default {
   },
   beforeCreate: function () {
     Promise.all([
-      axios.get('http://localhost:3000' + '/players?gameCode=' + this.gameCode),
-      axios.get('http://localhost:3000' + '/games?code=' + this.gameCode)
+      axios.get(process.env.VUE_APP_API + '/players?gameCode=' + this.gameCode),
+      axios.get(process.env.VUE_APP_API + '/games?code=' + this.gameCode)
     ]).then(async([players, games]) => {
       this.players = players.data.filter(p => p.gameCode)
       this.game = games.data[0]
@@ -118,7 +118,7 @@ export default {
     done: function () {
       this.currentPlayer.hasPlayed = true
       this.updateScoreboard()
-      axios.put('http://localhost:3000' + `/players/${this.currentPlayer.id}`, this.currentPlayer)
+      axios.put(process.env.VUE_APP_API + `/players/${this.currentPlayer.id}`, this.currentPlayer)
       .then(res => {
         this.$router.go() // reload page to trigger player update
         console.log(res)
@@ -133,7 +133,7 @@ export default {
         this.lastRound = true
       }
       if(haveNotPlayed.length == 0) {
-        axios.patch('http://localhost:3000' + `/games/${this.game.id}`, { status: 'done' })
+        axios.patch(process.env.VUE_APP_API + `/games/${this.game.id}`, { status: 'done' })
         this.displayScoreboard = true
         return
       }
@@ -168,12 +168,12 @@ export default {
       if (this.status.left == this.currentWordsList.length) {
         this.team1.forEach(winner => {
           let w = this.players.find(p => winner.id == p.id)
-          axios.patch('http://localhost:3000' + `/players/${w.id}`, { score: w.score+1 })
+          axios.patch(process.env.VUE_APP_API + `/players/${w.id}`, { score: w.score+1 })
         })
       } else {
         this.team2.forEach(winner => {
           let w = this.players.find(p => winner.id == p.id)
-          axios.patch('http://localhost:3000' + `/players/${w.id}`, { score: w.score+1 })
+          axios.patch(process.env.VUE_APP_API + `/players/${w.id}`, { score: w.score+1 })
         })
       }
     }

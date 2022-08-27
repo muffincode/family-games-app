@@ -79,7 +79,7 @@ export default {
       const now = Date.now()
       this.game.code = Math.floor(Math.random() * 10000)
       // Post to API
-      axios.post('http://localhost:3000' + '/games', {
+      axios.post(process.env.VUE_APP_API + '/games', {
           dateCreated: now,
           code: this.game.code,
           status: this.game.status,

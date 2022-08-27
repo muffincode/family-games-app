@@ -110,7 +110,7 @@ export default {
     start: function () {
       this.game.status = "running"
       const updatedGame = this.game
-      axios.put('http://localhost:3000' + `/games/${this.game.id}`, updatedGame)
+      axios.put(process.env.VUE_APP_API + `/games/${this.game.id}`, updatedGame)
         .then(response => {
           console.log(response);
         })
@@ -129,7 +129,7 @@ export default {
       // TODO fix player joining 2 games at once
       axios({
         method: playerId ? 'put' : 'post', //if playerId exists, update, else post
-        url: 'http://localhost:3000' + '/players/' + (playerId ? playerId : ''),
+        url: process.env.VUE_APP_API + '/players/' + (playerId ? playerId : ''),
         data: {
           name: this.name,
           gameCode: this.game.code,
@@ -155,8 +155,8 @@ export default {
       if (this.game.status == "running") return;
 
       Promise.all([
-        axios.get('http://localhost:3000' + '/players?gameCode=' + this.game.code),
-        axios.get('http://localhost:3000' + '/games', {
+        axios.get(process.env.VUE_APP_API + '/players?gameCode=' + this.game.code),
+        axios.get(process.env.VUE_APP_API + '/games', {
           params: {
             code: this.game.code
           }
@@ -190,7 +190,7 @@ export default {
       localStorage.removeItem('playerId')
     }
 
-    axios.get('http://localhost:3000' + '/players?gameCode=' + this.game.code)
+    axios.get(process.env.VUE_APP_API + '/players?gameCode=' + this.game.code)
       .then(res => {
         this.otherPlayers = res.data.filter(p => p.gameCode)
         let yourWords = this.otherPlayers.find(p => p.name == this.name)
