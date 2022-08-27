@@ -179,6 +179,26 @@ export default {
     }
   },
   mounted: function () {
+    if(this.$route.query.demo) {
+      const dummy = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      for (let i = 0; i < 4; i ++) {
+        axios.post(process.env.VUE_APP_API + '/players', {
+          name: "John " + dummy[Math.floor(Math.random()*20)%dummy.length],
+          gameCode: this.$route.params.code,
+          wordsList: [
+            "Word 1" + Math.floor(Math.random()*1000%dummy.length),
+            "Word 2" + Math.floor(Math.random()*1000%dummy.length),
+            "Word 3" + Math.floor(Math.random()*1000%dummy.length),
+            "Word 4" + Math.floor(Math.random()*1000%dummy.length),
+            "Word 5" + Math.floor(Math.random()*1000%dummy.length),
+            "Word 6" + Math.floor(Math.random()*1000%dummy.length)
+          ],
+          "hasPlayed": false,
+          "score": 0,
+        })
+      }
+    }
+
     this.admin = this.$route.query.admin
     this.game.code = this.$route.params.code
 
