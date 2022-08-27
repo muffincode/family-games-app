@@ -13,7 +13,7 @@
               <input type="text" v-model="code" placeholder="Par exemple: 4562" class="input"/>
             </div>
           </div>
-          <button class="button is-primary" v-on:click="join">Rejoindre</button>
+          <button class="button is-primary" v-on:click="join" :disabled="!code">Rejoindre</button>
         </div>
       </div>
 
