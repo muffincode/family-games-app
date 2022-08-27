@@ -39,20 +39,12 @@
     <div class="block" v-if="displayScoreboard">
       <h1 class="title is-1">Scores</h1>
       <ul>
-        <li v-for="p in players" :key="p.id" class="notification is-light" style="display:flex; justify-content:space-between;">
-          <b>{{p.name}}</b><span>{{p.score}} points</span>
+        <li v-for="(p, index) in players" :key="p.id"
+          class="notification"
+          :class="{ 'is-warning': index === 0, 'is-danger': index===players.length-1 }"
+          style="display:flex; justify-content:space-between;">
+          <b>{{ index===0? '🏆' : ''}} {{p.name}}</b><span>{{p.score}} points</span>
         </li>
-        <!-- TODO styling :
-        <li class="notification is-warning" style="display:flex; justify-content:space-between;">
-          <b>🏆 Camille</b><span>45 points</span>
-        </li>
-        <li class="notification is-light" style="display:flex; justify-content:space-between;">
-          <b>Constan</b><span>23 points</span>
-        </li>
-        <li class="notification is-danger" style="display:flex; justify-content:space-between;">
-          <b>Mary</b><span>10 points</span>
-        </li>
-        -->
       </ul>
       <hr/>
       <a href="/">
