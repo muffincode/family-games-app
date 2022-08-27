@@ -85,10 +85,11 @@ export default {
           status: this.game.status,
           mode: this.game.mode,
           nbWords: this.game.nbWords,
+          minPlayers: 5, // TODO change depending on game mode
           validUntil: new Date().setTime(now + 12 /*hour*/ * 60 * 60 * 1000),
         })
         .then(response => {
-          // Object is created, update view
+          // Object is created, update view TODO check if needed?
           this.game.status = "created"
           console.log(response);
         })
