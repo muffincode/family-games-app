@@ -1,40 +1,44 @@
 <template>
-  <div class="game-creation container">
-    <div class="section" v-if="game.status != 'created'">
-      <h2 class="title is-3">Créer une partie</h2>
-      <form class="form">
+  <div class="game-creation section">
+    <div class="container">
+      <div class="block card" v-if="game.status != 'created'">
+        <div class="card-content">
+          <h2 class="title is-3">Créer une partie</h2>
+          <form class="form">
 
-        <div class="field">
-          <label class="label">Mode de jeu</label>
-          <div class="select">
-            <select v-model="game.mode">
-              <option value="0">Sélectionner un mode de jeu</option>
-              <option value="mimes">Mimes en équipes</option>
-              <option value="mdp">(Mot de passe)</option>
-              <option value="timesup">(Time's up)</option>
-            </select>
-          </div>
+            <div class="field">
+              <label class="label">Mode de jeu</label>
+              <div class="select">
+                <select v-model="game.mode">
+                  <option value="0">Sélectionner un mode de jeu</option>
+                  <option value="mimes">Mimes en équipes</option>
+                  <option value="mdp">(Mot de passe)</option>
+                  <option value="timesup">(Time's up)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label">Nombre de mots</label>
+              <div class="select" v-if="game.mode == 'mimes'">
+                <select v-model="game.nbWords">
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="button is-primary" v-on:click="createGame">
+              Créer
+            </div>
+
+          </form>
         </div>
-
-        <div class="field">
-          <label class="label">Nombre de mots</label>
-          <div class="select" v-if="game.mode == 'mimes'">
-            <select v-model="game.nbWords">
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="button is-primary" v-on:click="createGame">
-          Créer
-        </div>
-
-      </form>
+      </div>
     </div>
 
-    <div class="section" v-if="game.status == 'created'">
+    <div class="container" v-if="game.status == 'created'">
       <div class="notification is-primary">
         <p>La partie a été créée avec succès !</p>
         <b class="title is-2">{{ game.code }}</b>
@@ -100,16 +104,4 @@ export default {
 </script>
 
 <style lang="scss">
-
-.section {
-  max-width:800px;
-  display: flex;
-  flex-direction: column;
-  form {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-  }
-}
 </style>

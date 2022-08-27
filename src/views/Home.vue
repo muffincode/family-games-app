@@ -1,27 +1,31 @@
 <template>
-  <div class="home container">
-    <div class="section">
+  <div class="home section">
+    <div class="container">
       <h1 class="title is-1">Lock&</h1>
       <hr/>
-      <div class="block">
-        <h2 class="title is-3">Rejoindre une partie</h2>
+      <div class="block card">
+        <div class="card-content">
+          <h2 class="title is-3">Rejoindre une partie</h2>
 
-        <div class="field">
-          <label class="label">Code de la partie</label>
-          <div class="control">
-            <input type="text" v-model="code" placeholder="Par exemple: 4562" class="input"/>
+          <div class="field">
+            <label class="label">Code de la partie</label>
+            <div class="control">
+              <input type="text" v-model="code" placeholder="Par exemple: 4562" class="input"/>
+            </div>
           </div>
+          <button class="button is-primary" v-on:click="join">Rejoindre</button>
         </div>
-        <button class="button is-primary" v-on:click="join">Rejoindre</button>
       </div>
 
-      <hr/>
-
-      <div class="block">
-        <h2 class="title is-3">Créer une partie</h2>
-        <a href="/create">
-          <button class="button is-info">Créer</button>
-        </a>
+      <div class="block card">
+        <div class="card-content">
+          <h2 class="title is-3">Créer une partie</h2>
+          <p>Hébergez vous-même une partie, et partagez le code à vos amis !</p>
+          <br/>
+          <a href="/create">
+            <button class="button is-info">Créer</button>
+          </a>
+        </div>
       </div>
     </div>
   </div>

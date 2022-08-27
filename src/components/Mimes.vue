@@ -32,8 +32,14 @@
 
     <!-- Currently playing -->
     <div class="block list" v-if="playing && !displayScoreboard">
-      <CardItem colour="blue" :words="currentWordsList" :index="status.left" @next="status.left++"/>
-      <CardItem colour="red" :words="currentWordsList" :index="status.right" @next="status.right++"/>
+      <div class="columns">
+        <div class="column">
+          <CardItem colour="blue" :words="currentWordsList" :index="status.left" @next="status.left++"/>
+        </div>
+        <div class="column">
+          <CardItem colour="red" :words="currentWordsList" :index="status.right" @next="status.right++"/>
+        </div>
+      </div>
     </div>
 
     <div class="block" v-if="displayScoreboard">
@@ -127,6 +133,7 @@ export default {
         this.lastRound = true
       }
       if(haveNotPlayed.length == 0) {
+        axios.patch('http://localhost:3000' + `/games/${this.game.id}`, { status: 'done' })
         this.displayScoreboard = true
         return
       }
@@ -177,13 +184,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+.section {
+  max-width: 100%;
+}
 .list {
-  .box.small{ /* to do : reduced (when found, auto reduce)*/
-    font-size: 10px;
-    display: flex;
-    justify-content: space-between;
-    p { margin: 0;}
-  }
   .word {
     font-size: 300%;
     text-align: left;

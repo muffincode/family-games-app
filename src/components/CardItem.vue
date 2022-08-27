@@ -14,12 +14,21 @@
         {{ word }}
       </h1>
 
-      <button class="button is-rounded is-light"
-        :class="{ 'is-info': colour=='blue', 'is-danger': colour=='red' }"
-        @click="$emit('next')"
-        :disabled="index == words.length">
-        {{ index == words.length ? "Terminé 🥳" : "C'est bon !" }}
-      </button>
+      <div class="buttons">
+        <button class="button is-rounded"
+          :class="{ 'is-info': colour=='blue', 'is-danger': colour=='red' }"
+          @click="blurred = !blurred">
+          {{ blurred ? "Afficher" : "Masquer" }}
+        </button>
+
+        <button class="button is-rounded is-light"
+          :class="{ 'is-info': colour=='blue', 'is-danger': colour=='red' }"
+          @click="$emit('next')"
+          :disabled="index == words.length">
+          {{ index == words.length ? "Terminé 🥳" : "Suivant" }}
+        </button>
+
+      </div>
     </div>
   </div>
 </template>
@@ -84,6 +93,9 @@ export default {
   }
   .red {
     background: #f14668;
+  }
+  .buttons {
+    justify-content: flex-end;
   }
 }
 
