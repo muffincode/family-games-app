@@ -8,7 +8,7 @@
     </div>
 
     <!-- Game is ok to be joined -->
-    <div class="container" v-if="game.status == 'open'">
+    <div class="container" v-if="game.status == 'pending'">
       <h2 class="title is-2">{{ game.name }} <span class="tag is-info is-light">{{ game.code }}</span></h2>
 
       <!-- Welcome message -->
@@ -32,7 +32,11 @@
           <span v-for="p in otherPlayers" class="tag is-dark" :key="p.id">{{ p.name }}</span>
         </div>
 
-        <div class="button is-danger" v-on:click="start">Lancer la partie 🎲</div>
+        <button class="button is-danger"
+          v-on:click="start"
+          :disabled="otherPlayers.length < game.minPlayers"
+        >
+          Lancer la partie 🎲</button>
       </div>
 
       <!-- Player info -->
@@ -65,7 +69,7 @@
     </div>
 
     <!-- Game is currently running -->
-    <Mimes :gameCode="this.game.code" v-if="game.status == 'running'"/>
+    <Mimes :gameCode="this.game.code" v-if="game.status == 'running' || game.status == 'done'"/>
   </div>
 </template>
 
@@ -96,7 +100,7 @@ export default {
       playerReady: false,
 
       game: {
-        status: null,
+        status: 'pending',
       },
       words: []
     }
@@ -108,8 +112,6 @@ export default {
       const updatedGame = this.game
       axios.put('http://localhost:3000' + `/games/${this.game.id}`, updatedGame)
         .then(response => {
-          // Object is created, update view
-          this.game.status = "created"
           console.log(response);
         })
         .catch(function (error) {
@@ -166,15 +168,11 @@ export default {
         this.game.nbWords = parseInt(this.game.nbWords)
 
         if (this.game.status != "running" && between(this.game.dateCreated, this.game.validUntil)) {
-          this.game.status = "open"
-
           switch (this.game.mode){
             case "mimes":
               this.game.name =  "Mimes"
               break;
           }
-        } else if (this.game.status != "running"){
-          this.game.status = "invalid"
         }
       })
       .catch(err => console.log(err))

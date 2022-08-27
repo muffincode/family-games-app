@@ -45,7 +45,7 @@
     <div class="block" v-if="displayScoreboard">
       <h1 class="title is-1">Scores</h1>
       <ul>
-        <li v-for="(p, index) in players" :key="p.id"
+        <li v-for="(p, index) in players.sort((a,b)=>b.score-a.score)" :key="p.id"
           class="notification"
           :class="{ 'is-warning': index === 0, 'is-danger': index===players.length-1 }"
           style="display:flex; justify-content:space-between;">
