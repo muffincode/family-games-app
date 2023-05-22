@@ -1,5 +1,7 @@
 # family-games-app
 
+Le projet est accessible ici : https://lockand.netlify.app/
+
 ## Project setup
 ```
 yarn install
