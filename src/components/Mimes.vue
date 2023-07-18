@@ -165,15 +165,19 @@ export default {
       this.team2 = players
     },
     updateScoreboard: function() {
+      let bonus = 50
+
       if (this.status.left == this.currentWordsList.length) {
+        bonus += (this.currentWordsList.length - this.status.right) * 5
         this.team1.forEach(winner => {
           let w = this.players.find(p => winner.id == p.id)
-          axios.patch(process.env.VUE_APP_API + `/players/${w.id}`, { score: w.score+1 })
+          axios.patch(process.env.VUE_APP_API + `/players/${w.id}`, { score: w.score+bonus })
         })
       } else {
+        bonus += (this.currentWordsList.length - this.status.left) * 5
         this.team2.forEach(winner => {
           let w = this.players.find(p => winner.id == p.id)
-          axios.patch(process.env.VUE_APP_API + `/players/${w.id}`, { score: w.score+1 })
+          axios.patch(process.env.VUE_APP_API + `/players/${w.id}`, { score: w.score+bonus })
         })
       }
     }
