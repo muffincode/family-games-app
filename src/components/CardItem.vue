@@ -4,8 +4,9 @@
       <span
         class="tag is-small is-light is-rounded"
         :class="{ 'is-info': colour=='blue', 'is-danger': colour=='red' }"
+        v-if="index <= words.length-1"
       >
-        {{ index }} / {{ words.length }}
+        {{ index }} mots trouvés · {{ words.length - index }} restants
       </span>
 
       <h1 class="title is-1"
@@ -15,17 +16,18 @@
       </h1>
 
       <div class="buttons">
+
         <button class="button is-rounded"
           :class="{ 'is-info': colour=='blue', 'is-danger': colour=='red' }"
-          @click="blurred = !blurred">
-          {{ blurred ? "Afficher" : "Masquer" }}
+          @click="$emit('prev')"
+          :disabled="index == 0">Précédent
         </button>
 
         <button class="button is-rounded is-light"
           :class="{ 'is-info': colour=='blue', 'is-danger': colour=='red' }"
           @click="$emit('next')"
           :disabled="index == words.length">
-          {{ index == words.length ? "Terminé 🥳" : "Suivant" }}
+          {{ index == words.length ? "Bravo 🥳" : (index == words.length-1 ? "Terminer" : "Suivant") }}
         </button>
 
       </div>

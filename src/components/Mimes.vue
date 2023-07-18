@@ -34,10 +34,10 @@
     <div class="block list" v-if="playing && !displayScoreboard">
       <div class="columns">
         <div class="column">
-          <CardItem colour="blue" :words="currentWordsList" :index="status.left" @next="status.left++"/>
+          <CardItem colour="blue" :words="currentWordsList" :index="status.left" @next="status.left++" @prev="status.left--"/>
         </div>
         <div class="column">
-          <CardItem colour="red" :words="currentWordsList" :index="status.right" @next="status.right++"/>
+          <CardItem colour="red" :words="currentWordsList" :index="status.right" @next="status.right++" @prev="status.right--"/>
         </div>
       </div>
     </div>
